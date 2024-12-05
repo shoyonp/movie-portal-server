@@ -36,7 +36,7 @@ async function run() {
 
     app.get("/movies/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { id: new ObjectId(id) };
+      const query = { _id: new ObjectId(id) };
       const result = await movieCollection.findOne(query);
       res.send(result);
     });
@@ -45,6 +45,25 @@ async function run() {
       const newMovie = req.body;
       console.log(newMovie);
       const result = await movieCollection.insertOne(newMovie);
+      res.send(result);
+    });
+
+    app.put("/movies/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedMovie = req.body;
+      const movie = {
+        $set: {
+          name: updatedMovie.name,
+          photo: updatedMovie.photo,
+          genre: updatedMovie.genre,
+          duration: updatedMovie.duration,
+          releaseYear: updatedMovie.releaseYear,
+          summary: updatedMovie.summary,
+        },
+      };
+      const result = await movieCollection.updateOne(filter, movie, options);
       res.send(result);
     });
 
