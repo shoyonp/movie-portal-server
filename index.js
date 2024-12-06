@@ -29,7 +29,13 @@ async function run() {
     const movieCollection = client.db("movieDB").collection("movie");
 
     app.get("/movies", async (req, res) => {
-      const cursor = movieCollection.find();
+      const { search } = req.query;
+      let option = {};
+      if (search) {
+        option = { name: { $regex: search, $options: "i" } };
+      }
+
+      const cursor = movieCollection.find(option);
       const result = await cursor.toArray();
       res.send(result);
     });
