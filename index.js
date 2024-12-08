@@ -28,6 +28,8 @@ async function run() {
 
     const movieCollection = client.db("movieDB").collection("movie");
 
+    const userFavMovieCollection = client.db("movieDB").collection("userMovies");
+
     app.get("/movies", async (req, res) => {
       const { search } = req.query;
       let option = {};
@@ -77,6 +79,30 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await movieCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // users favorite movie related api
+
+    app.get("/favMovies/:email", async (req, res) => {
+      const { email } = req.params;
+      // console.log(email);
+      const cursor = { email };
+      const result = await userFavMovieCollection.find(cursor).toArray();
+      res.send(result);
+    });
+
+    app.post("/favMovies", async (req, res) => {
+      const newUserMovie = req.body;
+      console.log("creating new user movie");
+      const result = await userFavMovieCollection.insertOne(newUserMovie);
+      res.send(result);
+    });
+
+    app.delete("/favMovies/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userFavMovieCollection.deleteOne(query);
       res.send(result);
     });
 
