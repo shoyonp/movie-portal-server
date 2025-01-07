@@ -33,12 +33,17 @@ async function run() {
 
     app.get("/movies", async (req, res) => {
       const { search } = req.query;
-      let option = {};
-      if (search) {
-        option = { name: { $regex: search, $options: "i" } };
+      const { sort } = req.query;
+      console.log(sort);
+      let options = {};
+      if (sort) {
+        options = { sort: { releaseYear: sort === "asc" ? 1 : -1 } };
       }
-
-      const cursor = movieCollection.find(option);
+      let query = {};
+      if (search) {
+        query = { name: { $regex: search, $options: "i" } };
+      }
+      const cursor = movieCollection.find(options, query);
       const result = await cursor.toArray();
       res.send(result);
     });
